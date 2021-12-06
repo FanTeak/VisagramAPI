@@ -15,6 +15,6 @@ namespace VisagramAPI.Models
         [Column(TypeName = "nvarchar(100)")]
         public string OfferName { get; set; }
 
-        public decimal OfferPrice { get; set; }
+        public decimal OfferValue { get; set; }
     }
 }

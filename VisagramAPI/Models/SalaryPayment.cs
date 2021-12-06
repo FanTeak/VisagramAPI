@@ -16,10 +16,13 @@ namespace VisagramAPI.Models
         public string PaymentNumber { get; set; }
 
         public int StaffId { get; set; }
+        public Staff Staff { get; set; }
 
         [Column(TypeName = "nvarchar(10)")]
         public string PaymentType { get; set; }
 
         public decimal Total { get; set; }
+
+        public List<SalaryDetails> OrderDetails { get; set; }
     }
 }

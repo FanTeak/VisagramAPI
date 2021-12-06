@@ -13,10 +13,10 @@ namespace VisagramAPI.Models
         public int StaffId { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]
-        public string CustomerName { get; set; }
+        public string StaffName { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]
-        public string CustomerSurname { get; set; }
+        public string StaffSurname { get; set; }
 
         [Column(TypeName = "nvarchar(12)")]
         public string Phone { get; set; }

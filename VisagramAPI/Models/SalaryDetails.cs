@@ -14,8 +14,9 @@ namespace VisagramAPI.Models
         public long SalaryPaymentId { get; set; }
 
         public int SalaryOfferId { get; set; }
+        public SalaryOffer SalaryOffer { get; set; }
 
-        public decimal SalaryOfferPrice { get; set; }
+        public decimal SalaryOfferValue { get; set; }
 
         public float Quantity { get; set; }
     }
