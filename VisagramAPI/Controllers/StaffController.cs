@@ -10,30 +10,30 @@ namespace VisagramAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SalaryPaymentController : ControllerBase
+    public class StaffController : ControllerBase
     {
         private readonly VisagramDbContext _context;
-        public SalaryPaymentController(VisagramDbContext context)
+        public StaffController(VisagramDbContext context)
         {
             _context = context;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<SalaryPayment>>> GetSalaryPayments()
+        public async Task<ActionResult<IEnumerable<Staff>>> GetStaffs()
         {
-            return await _context.SalaryPayments.ToListAsync();
+            return await _context.Staffs.ToListAsync();
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<SalaryPayment>> GetSalaryPayment(long id)
+        public async Task<ActionResult<Staff>> GetStaff(long id)
         {
-            var salaryPayment = await _context.SalaryPayments.FindAsync(id);
-            if (salaryPayment == null)
+            var staff = await _context.Staffs.FindAsync(id);
+            if (staff == null)
             {
                 return NotFound();
             }
 
-            return salaryPayment;
+            return staff;
         }
 
         // // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -78,32 +78,32 @@ namespace VisagramAPI.Controllers
 
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<SalaryPayment>> PostSalaryPayment(SalaryPayment salaryPayment)
+        public async Task<ActionResult<Staff>> PostStaff(Staff staff)
         {
-            _context.SalaryPayments.Add(salaryPayment);
+            _context.Staffs.Add(staff);
             await _context.SaveChangesAsync();
             //return CreatedAtAction("GetSalaryPayment", new { id = salaryPayment.PaymentId}, salaryPayment);
-            return CreatedAtAction("GetSalaryPayment", new {id = salaryPayment.PaymentId}, salaryPayment);
+            return CreatedAtAction("GetStaff", new { id = staff.StaffId }, staff);
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSalaryPayment(long id)
+        public async Task<IActionResult> DeleteStaff(long id)
         {
-            var salaryPayment = await _context.SalaryPayments.FindAsync(id);
-            if (salaryPayment == null)
+            var staff = await _context.Staffs.FindAsync(id);
+            if (staff == null)
             {
                 return NotFound();
             }
 
-            _context.SalaryPayments.Remove(salaryPayment);
+            _context.Staffs.Remove(staff);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool SalaryPaymentExists(long id)
+        private bool StaffExists(long id)
         {
-            return _context.SalaryPayments.Any(e => e.PaymentId == id);
+            return _context.Staffs.Any(e => e.StaffId == id);
         }
     }
 }
