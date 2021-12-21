@@ -24,5 +24,8 @@ namespace VisagramAPI.Models
         public decimal Total { get; set; }
 
         public List<SalaryDetails> OrderDetails { get; set; }
+
+        [NotMapped]
+        public string DeletedSalaryItemIds { get; set; }
     }
 }
