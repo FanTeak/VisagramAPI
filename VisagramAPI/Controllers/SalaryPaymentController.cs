@@ -21,60 +21,92 @@ namespace VisagramAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SalaryPayment>>> GetSalaryPayments()
         {
-            return await _context.SalaryPayments.ToListAsync();
+            return await _context.SalaryPayments.Include(x=>x.Staff).ToListAsync();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<SalaryPayment>> GetSalaryPayment(long id)
         {
-            var salaryPayment = await _context.SalaryPayments.FindAsync(id);
+            var paymentDetails = await (from payment in _context.Set<SalaryPayment>()
+                join detail in _context.Set<SalaryDetails>() 
+                    on payment.PaymentId equals detail.SalaryPaymentId
+                join offer in _context.Set<SalaryOffer>()
+                    on detail.SalaryOfferId equals offer.SalaryOfferId
+                where payment.PaymentId == id
+                select new
+                {
+                    payment.PaymentId,
+                    detail.SalaryDetailsId,
+                    detail.SalaryOfferId,
+                    detail.Quantity,
+                    detail.SalaryOfferValue,
+                    offer.OfferName
+                }).ToListAsync();
+
+            var salaryPayment = await (from a in _context.Set<SalaryPayment>()
+                where a.PaymentId == id
+                select new
+                {
+                    a.PaymentId,
+                    a.PaymentNumber,
+                    a.StaffId,
+                    a.PaymentType,
+                    a.Total,
+                    deletedSalaryItemIds = "",
+                    orderDetails = paymentDetails
+                }).FirstOrDefaultAsync();
+
             if (salaryPayment == null)
             {
                 return NotFound();
             }
 
-            return salaryPayment;
+            return Ok(salaryPayment);
         }
 
         // // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        // [HttpPut("{id}")]
-        // public async Task<IActionResult> PutGame(long id, Game game) {
-        //     if (id != game.GameId) {
-        //         return BadRequest();
-        //     }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutSalaryPayment(long id, SalaryPayment salaryPayment)
+        {
+            if (id != salaryPayment.PaymentId)
+            {
+                return BadRequest();
+            }
 
-        //     _context.Entry(game).State = EntityState.Modified;
+            _context.Entry(salaryPayment).State = EntityState.Modified;
 
-        //     foreach (EquipmentUsage item in game.EquipmentUsages) {
-        //         if (item.EquipmentUsageId == 0)
-        //             _context.EquipmentUsages.Add(item);
-        //         else
-        //             _context.Entry(item).State = EntityState.Modified;
-        //     }
+            foreach (SalaryDetails detail in salaryPayment.OrderDetails)
+            {
+                if (detail.SalaryDetailsId == 0)
+                    _context.SalaryDetails.Add(detail);
+                else
+                    _context.Entry(detail).State = EntityState.Modified;
+            }
 
-        //     foreach (var i in game.DeletedOrderItemIds.Split(',').Where(x => x !="")) {
-        //         OrderDetail y = _context.OrderDetails.Find(Convert.ToInt64(i));
-        //         _context.OrderDetails.Remove(y);
-        //     }
+            foreach (var i in salaryPayment.DeletedSalaryItemIds.Split(',').Where(x => x != ""))
+            {
+                SalaryDetails y = _context.SalaryDetails.Find(Convert.ToInt64(i));
+                _context.SalaryDetails.Remove(y);
+            }
 
-        //     try
-        //     {
-        //         await _context.SaveChangesAsync();
-        //     }
-        //     catch (DbUpdateConcurrencyException)
-        //     {
-        //         if (!OrderMasterExists(id))
-        //         {
-        //             return NotFound();
-        //         }
-        //         else
-        //         {
-        //             throw;
-        //         }
-        //     }
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!SalaryPaymentExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
-        //     return NoContent();
-        // }
+            return NoContent();
+        }
 
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
